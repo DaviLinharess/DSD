@@ -24,6 +24,7 @@ urlpatterns = [
 
     # rota de tarefas
     path('api/', include('tarefas.urls')),
+    path('api/', include('categorias.urls')),
 
     # rota do swagger
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
