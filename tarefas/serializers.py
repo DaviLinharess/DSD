@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from .models import Tarefa
 
-class TarefaSerializer(serializers.ModelSerializer):
+class TarefaSerializer(serializers.HyperlinkedModelSerializer):
+
     class Meta:
         model = Tarefa
-        fields = '__all__'
+        fields = ['url', 'id', 'titulo', 'descricao', 'concluida', 'data_criacao']
 
         
