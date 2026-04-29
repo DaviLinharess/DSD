@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciador de Tarefas</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 50px; 
+            background-color: #f0f2f5; 
+        }
+        .card { background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: #1c1e21; 
+        }
+        button { 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+        p {
+            margin: 5px 0; 
+            color: #555; 
+            font-size: 0.9em;
+        }
+        .tarefa { 
+            border-bottom: 1px solid #ddd; 
+            padding: 10px 0; 
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Minhas Tarefas (Via Gateway)</h1>
+        <button onclick="carregarTarefas()">Atualizar Lista</button>
+        <div id="lista"></div>
+    </div>
+
+    <script>
+        //Função assíncrona pra buscar dados da API
+        async function carregarTarefas() {
+            const divLista = document.getElementById('lista');
+            divLista.innerHTML = 'Carregando...';
+
+            try {
+                const response = await fetch('/tarefas');       // Chamada ao gateway
+
+                const tarefas = await response.json();          // Converte as respostas do gateway (JSON) para objeto JavaScript
+                
+                divLista.innerHTML = '';                        // Limpa a mensagem de "Carregando..."
+
+                //Itera pra pegar as listas de tarefas recebidas
+                tarefas.forEach(t => {
+                    divLista.innerHTML += `
+                        <div class="tarefa">
+                            <strong>${t.titulo}</strong> - ${t.concluida ? '✅' : '⏳'}
+
+                            <p>
+                                ${t.descricao || '<i>Sem descrição</i>'}
+                            </p>
+                        </div>`;
+                });
+
+            } catch (e) {
+                // Tratamento de erro se o Gateway ou Django estiver offline
+                divLista.innerHTML = '<p style="color:red">Erro ao carregar tarefas.</p>';
+            }
+        }
+    </script>
+</body>
+</html>
