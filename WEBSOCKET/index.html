@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel de Pedidos - Tempo Real</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; }
+        #mensagens { background: #f4f4f4; padding: 10px; height: 200px; overflow-y: auto; border-radius: 5px; }
+        input, button { padding: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Painel de Pedidos (Live)</h2>
+    
+    <div id="mensagens"></div>
+    
+    <input type="text" id="inputPedido" placeholder="Ex: 2 Burgers Turbo...">
+    <button onclick="enviarMensagem()">Enviar Pedido</button>
+
+    <script>
+        // Estabelece a conexão WebSocket usando o protocolo ws://
+        const ws = new WebSocket('ws://localhost:8765');
+        const divMensagens = document.getElementById('mensagens');
+
+        // Evento de abertura de conexão
+        ws.onopen = () => {
+            adicionarMensagemNaTela("✅ Conectado ao servidor de pedidos.");
+        };
+
+        // Evento de recebimento de mensagem (do servidor)
+        ws.onmessage = (event) => {
+            const dados = JSON.parse(event.data);
+            adicionarMensagemNaTela(`🔔 ${dados.texto} (via cliente ${dados.remetente})`);
+        };
+
+        // Função para enviar mensagem (do cliente para o servidor)
+        function enviarMensagem() {
+            const input = document.getElementById('inputPedido');
+            if (input.value.trim() === '') return;
+
+            // Formato JSON
+            const mensagem = { pedido: input.value };
+            ws.send(JSON.stringify(mensagem));
+            input.value = '';
+        }
+
+        // Função auxiliar para exibir visualmente na tela
+        function adicionarMensagemNaTela(texto) {
+            const p = document.createElement('p');
+            p.textContent = texto;
+            divMensagens.appendChild(p);
+            divMensagens.scrollTop = divMensagens.scrollHeight;
+        }
+    </script>
+</body>
+</html>
