@@ -2,14 +2,14 @@ import asyncio
 import websockets
 import json
 
-# Armazena os clientes conectados (Decisão A: uso de um Set em memória)
+# Armazena os clientes conectados (uso do set pra não ter duplicatas e ajudar a remover)
 clientes_conectados = set()
 
 async def gerenciar_conexao(websocket):
-    # Adiciona a nova conexão ao conjunto
+    # Adiciona o cliente a lista de conectados
     clientes_conectados.add(websocket)
     
-    # Identifica o cliente pelo ID único do objeto na memória (Decisão B)
+    # Identificador do cliente (id do objeto websocket)
     cliente_id = id(websocket)
     print(f"[Conexão Aberta] Cliente conectado: {cliente_id}")
 
@@ -18,10 +18,10 @@ async def gerenciar_conexao(websocket):
         async for mensagem in websocket:
             print(f"[Mensagem Recebida] de {cliente_id}: {mensagem}")
             
-            # Formato de mensagem: JSON (Decisão D)
+            # Formato de mensagem: JSON com campo "pedido"
             dados = json.loads(mensagem)
             
-            # Prepara a mensagem de broadcast para todos
+            # Cria a mensagem de broadcast para todos os clientes conectados
             resposta = json.dumps({
                 "remetente": cliente_id,
                 "texto": f"Novo pedido recebido: {dados['pedido']}"
@@ -31,7 +31,7 @@ async def gerenciar_conexao(websocket):
             websockets.broadcast(clientes_conectados, resposta)
             
     except websockets.exceptions.ConnectionClosed:
-        # Lida com quedas de conexão abruptas (Decisão C)
+        # O cliente desconectou, o loop é quebrado e o cliente é removido
         pass
     finally:
         # Quando o loop quebra (cliente desconectou), remove do conjunto
