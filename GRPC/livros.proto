@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package livros;
+
+service LivroService {
+  rpc CadastrarLivro (LivroRequest) returns (LivroResponse);
+  rpc ListarLivros (Empty) returns (ListaLivros);
+}
+
+message Livro {
+  int32 id = 1;
+  string titulo = 2;
+  string autor = 3;
+  int32 ano = 4;
+}
+
+message LivroRequest {
+  string titulo = 1;
+  string autor = 2;
+  int32 ano = 3;
+}
+
+message LivroResponse {
+  Livro livro = 1;
+}
+
+message ListaLivros {
+  repeated Livro livros = 1;
+}
+
+message Empty {
+}
